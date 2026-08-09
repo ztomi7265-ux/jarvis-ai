@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<div id="boot" class="boot">
+  <div class="boot-lines">
+    <p>&gt; DESPERTANDO A JARVIS...</p>
+    <p>&gt; ENLAZANDO MODELO NEURAL...</p>
+    <p class="boot-ok">&gt; LISTO PARA ESCUCHAR</p>
+  </div>
+</div>
+
+<div id="stars" class="stars"></div>
+<div class="scanlines"></div>
+
+<span class="bracket tl"></span>
+<span class="bracket tr"></span>
+<span class="bracket bl"></span>
+<span class="bracket br"></span>
+
+<div class="clock-box">
+  <div class="clock-time" id="clockTime">00:00:00</div>
+  <div class="clock-date" id="clockDate">—</div>
+</div>
+
+<main class="core-stage">
+
+  <div class="core-circle" id="micBtn" role="button" tabindex="0" title="Clic para activar o desactivar el micrófono">
+    <svg class="core-rings" viewBox="0 0 400 400">
+      <circle class="ring-static"   cx="200" cy="200" r="192"></circle>
+      <circle class="ring-static-2" cx="200" cy="200" r="172"></circle>
+      <circle class="ring-activity" cx="200" cy="200" r="192"></circle>
+      <g id="particles"></g>
+    </svg>
+
+    <div class="core-fill"></div>
+
+    <div class="core-label">
+      <span class="core-title">JARVIS</span>
+      <div class="waveform" id="waveform">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <span class="core-sub"><span class="dot" id="statusDot"></span><span id="statusText">EN ESPERA</span></span>
+      <span class="mic-hint" id="micHint">Toca el círculo para activar el micrófono</span>
+    </div>
+  </div>
+
+  <section class="panel">
+    <div class="panel-head"><span>REGISTRO</span></div>
+    <div id="log" class="log"></div>
+
+    <form id="composer" class="composer">
+      <label class="toggle">
+        <input type="checkbox" id="webToggle">
+        <span>🌐 Internet</span>
+      </label>
+      <div id="imagePreview" class="image-preview" style="display:none;">
+        <img id="imagePreviewImg" alt="Imagen adjunta">
+        <button type="button" id="removeImageBtn" title="Quitar imagen">✕</button>
+      </div>
+      <div class="input-row">
+        <input type="file" id="imageInput" accept="image/*" style="display:none;">
+        <button type="button" id="attachBtn" class="attach-btn" title="Adjuntar imagen">📎</button>
+        <input id="textInput" type="text" placeholder="Orden para Jarvis…" autocomplete="off">
+        <button type="submit" class="send-btn">➤</button>
+        <button type="button" id="forgetBtn" class="forget-btn" title="Borrar memoria">✕</button>
+      </div>
+    </form>
+  </section>
+
+</main>
+
+<script src="/static/js/script.js"></script>
+</body>
+</html>

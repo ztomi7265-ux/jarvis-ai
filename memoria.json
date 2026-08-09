@@ -1,0 +1,69 @@
+{
+  "hechos": [],
+  "historial": [
+    {
+      "role": "user",
+      "content": "una nueva función es la que quiero"
+    },
+    {
+      "role": "assistant",
+      "content": "¡Ah, claro! Una “nueva función” suena a que quieres que aprenda un truco nuevo, ¿no? 🤖\n\nDime exactamente qué quieres que haga JARVIS con esa función. Por ejemplo:\n\n* **“Crear un comando para calcular propinas”**  \n* **“Añadir una rutina que me recuerde beber agua cada 2 h”**  \n* **“Generar una lista de compras a partir de los productos que mencione”**\n\nCuanto más concreto seas, mejor podré “programar” esa función en mi cabeza (y guardarla como tu solicitud). ¡Vamos, suéltame la idea! 😉"
+    },
+    {
+      "role": "user",
+      "content": "jarvis Pon baby de Justin Bieber en Spotify"
+    },
+    {
+      "role": "assistant",
+      "content": "Reproduciendo «Baby» de Justin Bieber en Spotify. 🎧"
+    },
+    {
+      "role": "user",
+      "content": "Pon baby de Justin Bieber"
+    },
+    {
+      "role": "assistant",
+      "content": "Reproduciendo «Baby» de Justin Bieber, Ludacris en Spotify."
+    },
+    {
+      "role": "user",
+      "content": "para que nos dé tiempo para dejarlas"
+    },
+    {
+      "role": "assistant",
+      "content": "Entiendo que quieres algo de tiempo mientras suena la canción, pero no estoy seguro de si te refieres a:\n\n* **Un temporizador** (por ejemplo, “pon un timer de 5 min”)\n* **Un recordatorio** para hacer algo después de la canción\n* **Conocer la duración** de «Baby» y usarla como referencia\n\nDime cuál de esas opciones (u otra) necesitas y lo pongo en marcha. 😉"
+    },
+    {
+      "role": "user",
+      "content": "pon Luis Miguel"
+    },
+    {
+      "role": "assistant",
+      "content": "Reproduciendo «La Incondicional» de Luis Miguel en Spotify."
+    },
+    {
+      "role": "user",
+      "content": "Hola jarvis cómo vas"
+    },
+    {
+      "role": "assistant",
+      "content": "¡Hola! Aquí, listo para obedecer. ¿En qué te ayudo hoy?"
+    },
+    {
+      "role": "user",
+      "content": "nada por ahora"
+    },
+    {
+      "role": "assistant",
+      "content": "Todo bajo control, sin nada que atender. Cuando te surja alguna idea, recordatorio o canción que quieras, solo avísame. 😉"
+    },
+    {
+      "role": "user",
+      "content": "jarvis Pon Luis Miguel"
+    },
+    {
+      "role": "assistant",
+      "content": "Reproduciendo a Luis Miguel en Spotify. 🎤✨ (Si tienes alguna canción específica en mente, solo dímela y la pongo de inmediato)."
+    }
+  ]
+}
