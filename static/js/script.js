@@ -135,7 +135,11 @@ let pausadoPorHabla = false;    // pausado momentáneamente mientras Jarvis habl
 if(SpeechRecognitionAPI){
   reconocimiento = new SpeechRecognitionAPI();
   reconocimiento.lang = 'es-ES';
-  reconocimiento.continuous = true;
+  // Nota: continuous=true tiene un bug conocido en Safari/iOS donde nunca
+  // entrega el resultado hasta que apagas el micrófono a mano. Usamos
+  // continuous=false y lo reiniciamos solo (abajo) para simular el mismo
+  // efecto de "escucha continua" sin ese bug.
+  reconocimiento.continuous = false;
   reconocimiento.interimResults = false;
 
   reconocimiento.onstart = () => {
@@ -198,6 +202,24 @@ micBtn.addEventListener('click', () => {
 });
 
 // ---------- Síntesis de voz (texto -> voz) ----------
+
+// iOS solo deja reproducir audio "a la fuerza" (por código) si ya se
+// desbloqueó antes con un toque real del usuario. Preparamos un elemento
+// reutilizable y lo desbloqueamos en el primer toque en cualquier parte.
+const ttsAudioEl = new Audio();
+let audioDesbloqueado = false;
+function desbloquearAudioUnaVez(){
+  if(audioDesbloqueado) return;
+  audioDesbloqueado = true;
+  ttsAudioEl.play().catch(() => {});
+  ttsAudioEl.pause();
+  if('speechSynthesis' in window){
+    try{ speechSynthesis.speak(new SpeechSynthesisUtterance('')); }catch(e){}
+  }
+}
+document.addEventListener('click', desbloquearAudioUnaVez, { once: true });
+document.addEventListener('touchend', desbloquearAudioUnaVez, { once: true });
+
 function pausarMicParaHablar(){
   if(reconocimiento && reconociendoAhora){
     pausadoPorHabla = true;
@@ -240,11 +262,11 @@ async function hablar(texto){
     if(!resp.ok) throw new Error('elevenlabs no disponible');
     const blob = await resp.blob();
     const url = URL.createObjectURL(blob);
-    const audio = new Audio(url);
-    audio.onplay = () => setEstado('speaking');
-    audio.onended = () => { URL.revokeObjectURL(url); reanudarMicTrasHablar(); };
-    audio.onerror = () => { URL.revokeObjectURL(url); hablarConNavegador(texto); };
-    await audio.play();
+    ttsAudioEl.src = url;
+    ttsAudioEl.onplay = () => setEstado('speaking');
+    ttsAudioEl.onended = () => { URL.revokeObjectURL(url); reanudarMicTrasHablar(); };
+    ttsAudioEl.onerror = () => { URL.revokeObjectURL(url); hablarConNavegador(texto); };
+    await ttsAudioEl.play();
   }catch(err){
     // Si falla ElevenLabs (sin clave, sin crédito, sin red), usamos la voz del navegador.
     hablarConNavegador(texto);
