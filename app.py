@@ -296,5 +296,7 @@ def hablar():
 
 
 if __name__ == "__main__":
-    print("\n🤖 JARVIS está despertando... abre http://localhost:5000 en tu navegador\n")
-    app.run(debug=True, port=5000)
+    puerto = int(os.environ.get("PORT", 5000))
+    modo_debug = os.environ.get("FLASK_DEBUG", "1") == "1"
+    print(f"\n🤖 JARVIS está despertando... abre http://localhost:{puerto} en tu navegador\n")
+    app.run(debug=modo_debug, host="0.0.0.0", port=puerto)
