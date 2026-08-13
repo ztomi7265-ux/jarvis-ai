@@ -12,8 +12,11 @@ const imageInput = document.getElementById('imageInput');
 const imagePreview = document.getElementById('imagePreview');
 const imagePreviewImg = document.getElementById('imagePreviewImg');
 const removeImageBtn = document.getElementById('removeImageBtn');
+const chatActivoTitulo = document.getElementById('chatActivoTitulo');
+const nuevoChatBtn = document.getElementById('nuevoChatBtn');
 
 let imagenActual = null; // data URL de la imagen adjunta, o null
+let chatActualId = null; // id del chat guardado que está abierto (null = todavía no se ha guardado)
 
 attachBtn.addEventListener('click', () => imageInput.click());
 
@@ -48,7 +51,7 @@ function setEstado(estado){
   statusText.textContent = etiquetas[estado] || 'EN ESPERA';
 }
 
-function agregarMensaje(texto, quien, imagenUrl, spotify){
+function agregarMensaje(texto, quien, imagenUrl, spotify, notaCreada){
   const div = document.createElement('div');
   div.className = `msg ${quien}`;
   const etiqueta = quien === 'user' ? 'TÚ' : 'JARVIS';
@@ -67,6 +70,16 @@ function agregarMensaje(texto, quien, imagenUrl, spotify){
     link.className = 'spotify-link';
     link.textContent = `🎵 Abrir «${spotify.nombre}» en Spotify`;
     div.appendChild(link);
+  }
+  if(notaCreada){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'nota-link';
+    btn.textContent = `📝 Ver nota «${notaCreada.titulo}»`;
+    btn.addEventListener('click', () => {
+      if(window.notasBtnAbrirDesdeChat) window.notasBtnAbrirDesdeChat(notaCreada.id);
+    });
+    div.appendChild(btn);
   }
   log.appendChild(div);
   log.scrollTop = log.scrollHeight;
@@ -87,6 +100,15 @@ function abrirEnSpotify(spotify){
   setTimeout(() => iframe.remove(), 2500);
 }
 
+// ---------- Empezar un chat nuevo (vacío) ----------
+function empezarChatNuevo(){
+  chatActualId = null;
+  log.innerHTML = '';
+  chatActivoTitulo.textContent = 'NUEVA CONVERSACIÓN';
+  agregarMensaje('Sistemas en línea. Toca el círculo para hablar conmigo.', 'jarvis');
+}
+nuevoChatBtn.addEventListener('click', empezarChatNuevo);
+
 async function enviarMensaje(texto){
   const imagenParaEnviar = imagenActual;
   if(!texto.trim() && !imagenParaEnviar) return;
@@ -102,11 +124,23 @@ async function enviarMensaje(texto){
     const resp = await fetch('/api/chat', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ mensaje: texto, buscar_internet: webToggle.checked, imagen: imagenParaEnviar })
+      body: JSON.stringify({
+        mensaje: texto,
+        buscar_internet: webToggle.checked,
+        imagen: imagenParaEnviar,
+        chat_id: chatActualId,
+      })
     });
     const data = await resp.json();
-    agregarMensaje(data.respuesta, 'jarvis', null, data.spotify);
+    if(data.chat_id){
+      const esChatNuevo = chatActualId === null;
+      chatActualId = data.chat_id;
+      if(data.titulo) chatActivoTitulo.textContent = data.titulo.toUpperCase();
+      if(esChatNuevo && window.actualizarContadorChats) window.actualizarContadorChats();
+    }
+    agregarMensaje(data.respuesta, 'jarvis', null, data.spotify, data.nota_creada);
     if(data.spotify) abrirEnSpotify(data.spotify);
+    if(data.nota_creada && window.actualizarContadorNotas) window.actualizarContadorNotas();
     hablar(data.respuesta);
   }catch(err){
     agregarMensaje('No pude conectar con el servidor. ¿Está corriendo app.py?', 'jarvis');
@@ -120,9 +154,18 @@ form.addEventListener('submit', (e) => {
 });
 
 forgetBtn.addEventListener('click', async () => {
-  await fetch('/api/olvidar', { method:'POST' });
+  if(!chatActualId){
+    log.innerHTML = '';
+    agregarMensaje('Ya estaba en blanco este chat.', 'jarvis');
+    return;
+  }
+  await fetch('/api/olvidar', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ chat_id: chatActualId })
+  });
   log.innerHTML = '';
-  agregarMensaje('Memoria borrada. Empezamos de nuevo.', 'jarvis');
+  agregarMensaje('Borré el historial de este chat. Empezamos de nuevo.', 'jarvis');
 });
 
 // ---------- Reconocimiento de voz (voz -> texto), modo continuo ----------
@@ -172,8 +215,7 @@ if(SpeechRecognitionAPI){
   reconocimiento.onresult = (event) => {
     for(let i = event.resultIndex; i < event.results.length; i++){
       if(event.results[i].isFinal){
-        const texto = event.results[i][0].transcript;
-        enviarMensaje(texto);
+        enviarMensaje(event.results[i][0].transcript);
       }
     }
   };
@@ -305,6 +347,25 @@ if(starsContainer){
     s.style.animationDuration = (2 + Math.random() * 4) + 's';
     s.style.animationDelay = (Math.random() * 4) + 's';
     starsContainer.appendChild(s);
+  }
+}
+
+// ---------- Marcas tipo dial alrededor del círculo (decorativo) ----------
+const ticksGroup = document.getElementById('ticks');
+if(ticksGroup){
+  const total = 60;
+  const cx = 200, cy = 200, rIn = 196, rOutMinor = 202, rOutMajor = 208;
+  for(let i = 0; i < total; i++){
+    const mayor = i % 5 === 0;
+    const ang = (i / total) * Math.PI * 2 - Math.PI / 2;
+    const rOut = mayor ? rOutMajor : rOutMinor;
+    const x1 = cx + rIn * Math.cos(ang), y1 = cy + rIn * Math.sin(ang);
+    const x2 = cx + rOut * Math.cos(ang), y2 = cy + rOut * Math.sin(ang);
+    const linea = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    linea.setAttribute('x1', x1); linea.setAttribute('y1', y1);
+    linea.setAttribute('x2', x2); linea.setAttribute('y2', y2);
+    linea.setAttribute('class', 'tick' + (mayor ? ' major' : ''));
+    ticksGroup.appendChild(linea);
   }
 }
 

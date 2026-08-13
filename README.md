@@ -151,8 +151,8 @@ volver a encenderlo otro día, repite solo el **Paso 6** (`python app.py`).
 
 - **Conversar** contigo por texto o por voz (botón del micrófono).
 - **Recordar cosas** que le pidas explícitamente: escríbele
-  `"recuerda que mi color favorito es el azul"` y lo guardará para siempre
-  (en el archivo `memoria.json`).
+  `"recuerda que mi color favorito es el azul"` y lo guardará para esa
+  conversación (en el archivo `chats.json`).
 - **Buscar en internet**: activa la casilla "🌐 Buscar en internet" antes de
   preguntarle algo que necesite información actual (noticias, precios,
   datos recientes).
@@ -160,8 +160,26 @@ volver a encenderlo otro día, repite solo el **Paso 6** (`python app.py`).
   elige una foto (captura de pantalla, documento, lo que sea), escribe
   opcionalmente una pregunta sobre ella, y envíala. Jarvis la analiza y te
   responde.
-- Botón **"Olvidar"**: borra toda la memoria y el historial si quieres
-  empezar de cero.
+- **Reproducir música**: dile "pon [canción]", "reproduce [canción]" o
+  "toca [canción]" y Jarvis la busca y abre en Spotify.
+- Botón **"✕" junto al mensaje**: borra el historial de la conversación
+  actual si quieres empezar de cero en ese mismo chat.
+
+## 💬 Chats guardados
+
+Arriba a la derecha hay un botón **"💬 Chats"**. Cada conversación que
+tienes con Jarvis queda guardada por separado, como en cualquier app de
+chat:
+
+- El botón **"＋"** (junto al nombre del chat activo, o dentro del panel
+  de Chats) empieza una conversación nueva en blanco.
+- Cada chat guarda su propio historial y también lo que le pediste
+  "recordar" dentro de esa conversación específica (no se mezcla entre
+  chats).
+- El título de cada chat se pone solo, tomando tus primeras palabras del
+  primer mensaje.
+- Desde el panel de Chats puedes reabrir cualquier conversación anterior
+  o borrarla (ícono 🗑) para siempre.
 
 ## Notas importantes
 
@@ -176,12 +194,75 @@ volver a encenderlo otro día, repite solo el **Paso 6** (`python app.py`).
   en un servicio gratuito como Render o Railway — puedo ayudarte con eso
   cuando quieras dar ese salto.
 
-## ¿Algo no funciona?
+## Paso 7 — Publicar Jarvis en internet (para usarlo desde el iPad, o donde sea)
+
+Como tu iPad no está en la misma red que tu PC, la mejor opción es **publicar
+Jarvis en internet gratis**, con una dirección web fija. Así lo abres desde
+el iPad (o cualquier dispositivo) usando solo Chrome, sin instalar nada ahí,
+y sin depender de que tu PC esté prendida. Se hace con dos cuentas gratis:
+**GitHub** (donde subes los archivos) y **Render** (donde vive Jarvis en
+internet). Todo por el navegador, no necesitas instalar nada nuevo en tu PC.
+
+### 7.1 — Sube el proyecto a GitHub
+
+1. Crea una cuenta gratis en **https://github.com** (si no tienes una).
+2. Dale clic a **"New repository"** (o el botón verde "New"). Ponle un
+   nombre, por ejemplo `jarvis-ai`. Déjalo en **"Public"**. No marques
+   ninguna otra opción. Dale a **"Create repository"**.
+3. En la página del repositorio recién creado, busca el enlace
+   **"uploading an existing file"** (o el botón "Add file" → "Upload files").
+4. Arrastra **todos los archivos y carpetas** de tu `jarvis-ai` a esa
+   ventana (app.py, requirements.txt, README.md, templates, static — todo
+   menos el archivo `.env`, ese **NUNCA** lo subas porque tiene tus claves
+   secretas).
+5. Baja y dale a **"Commit changes"** para guardar la subida.
+
+### 7.2 — Conecta Render a ese repositorio
+
+1. Crea una cuenta gratis en **https://render.com** (puedes entrar
+   directamente con tu cuenta de GitHub, no pide tarjeta).
+2. Dale a **"New +"** → **"Web Service"**.
+3. Elige tu repositorio `jarvis-ai` de la lista (autoriza a Render a verlo
+   si te lo pide).
+4. En la configuración:
+   - **Name**: el que quieras, ej. `jarvis-ai`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `python app.py`
+   - **Instance Type**: elige el plan **"Free"**
+5. Baja hasta **"Environment Variables"** y agrega ahí las mismas claves
+   que tienes en tu `.env` (una por una, con "Add Environment Variable"):
+   - `GROQ_API_KEY`
+   - `ELEVENLABS_API_KEY` (si la usas)
+   - `ELEVENLABS_VOICE_ID` (si la usas)
+   - `SPOTIFY_CLIENT_ID` (si lo usas)
+   - `SPOTIFY_CLIENT_SECRET` (si lo usas)
+6. Dale a **"Create Web Service"**. Render va a instalar todo y prender a
+   Jarvis — tarda unos minutos la primera vez. Cuando termine, arriba te
+   muestra una dirección tipo `https://jarvis-ai-xxxx.onrender.com`.
+
+Esa dirección es la definitiva. Ábrela en Chrome desde tu iPad (o
+cualquier dispositivo, desde cualquier red) y ahí tienes a Jarvis
+funcionando completo — texto, voz y micrófono incluidos, porque ya es una
+dirección seguras (https).
+
+**Cosas a saber del plan gratis de Render:**
+- Si nadie usa Jarvis por un rato, se "duerme" solo para ahorrar recursos.
+  La próxima vez que entres, puede tardar hasta un minuto en despertar —
+  es normal, solo espera.
+- La memoria de Jarvis (lo que le pediste recordar) puede reiniciarse
+  cuando el servicio se reinicia o lo actualizas. Para uso personal del
+  día a día no debería ser un problema grande.
+- Cada vez que quieras actualizar a Jarvis (por ejemplo si yo te doy
+  archivos nuevos), subes los archivos actualizados a GitHub de la misma
+  forma (Paso 7.1) y Render lo vuelve a publicar solo.
 
 Los errores más comunes:
 - **"python no se reconoce como un comando"** → No marcaste "Add to PATH"
   al instalar Python. Vuelve a instalarlo y marca esa casilla.
 - **Jarvis responde con un mensaje de advertencia (⚠️)** → Revisa que tu
-  archivo `.env` tenga la clave de Groq bien pegada, sin espacios extra.
-- **El micrófono no aparece o no funciona** → Usa Chrome o Edge, y
-  permite el acceso al micrófono cuando el navegador lo pida.
+  archivo `.env` (o las Environment Variables en Render) tenga la clave
+  de Groq bien puesta, sin espacios extra.
+- **El micrófono no aparece o no funciona** → Usa Chrome o Edge, permite
+  el acceso al micrófono cuando el navegador lo pida, y asegúrate de estar
+  entrando por la dirección `https://...onrender.com` (no por una `http://`
+  normal).
