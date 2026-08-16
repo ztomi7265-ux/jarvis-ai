@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JARVIS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<!-- ---------- PIN DE ACCESO ---------- -->
+<div id="pinLock" class="pin-lock">
+  <div class="pin-grid"></div>
+  <div class="pin-box">
+    <span class="bracket tl"></span><span class="bracket tr"></span>
+    <span class="bracket bl"></span><span class="bracket br"></span>
+    <div class="pin-title">J.A.R.V.I.S.</div>
+    <div class="pin-sub">// ACCESO RESTRINGIDO — INGRESA EL PIN</div>
+    <input id="pinInput" class="pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="••••" autocomplete="off">
+    <button id="pinSubmit" class="pin-submit">DESBLOQUEAR</button>
+    <div id="pinError" class="pin-error" style="display:none;">✕ PIN incorrecto</div>
+  </div>
+</div>
+
+<div id="boot" class="boot">
+  <div class="boot-lines">
+    <p>&gt; DESPERTANDO A JARVIS...</p>
+    <p>&gt; ENLAZANDO MODELO NEURAL...</p>
+    <p class="boot-ok">&gt; LISTO PARA ESCUCHAR</p>
+  </div>
+</div>
+
+<div id="stars" class="stars"></div>
+<div class="nebula"></div>
+<div class="grid-floor"></div>
+<div class="scanlines"></div>
+<div class="sweep"></div>
+
+<span class="bracket tl"></span>
+<span class="bracket tr"></span>
+<span class="bracket bl"></span>
+<span class="bracket br"></span>
+
+<div class="clock-box" id="clockBox" role="button" tabindex="0" title="Ver hora en otras ciudades">
+  <div class="clock-time" id="clockTime">00:00:00</div>
+  <div class="clock-date" id="clockDate">—</div>
+</div>
+
+<div id="weatherBox" class="weather-box" style="display:none;">
+  <span class="weather-icon" id="weatherIcon">☀️</span>
+  <div class="weather-info">
+    <span class="weather-temp" id="weatherTemp">--°</span>
+    <span class="weather-lugar" id="weatherLugar">—</span>
+  </div>
+</div>
+
+<div id="worldClockPanel" class="world-clock-panel" style="display:none;">
+  <span class="world-clock-overline">// HORA MUNDIAL</span>
+  <div class="world-clock-row"><span>Madrid</span><span id="wcMadrid">--:--:--</span></div>
+  <div class="world-clock-row"><span>París</span><span id="wcParis">--:--:--</span></div>
+  <div class="world-clock-row"><span>Londres</span><span id="wcLondres">--:--:--</span></div>
+  <div class="world-clock-row"><span>Washington D.C.</span><span id="wcWashington">--:--:--</span></div>
+  <div class="world-clock-row"><span>Ciudad de México</span><span id="wcCdmx">--:--:--</span></div>
+  <div class="world-clock-row"><span>Buenos Aires</span><span id="wcBuenosAires">--:--:--</span></div>
+</div>
+
+<div class="telemetry-corner telemetry-bl">
+  <p>CHATS <span id="telChats">0</span></p>
+  <p>NOTAS <span id="telNotas">0</span></p>
+  <p>SESIÓN <span id="telSesion">00:00</span></p>
+</div>
+
+<div class="telemetry-corner telemetry-br">
+  <p>NÚCLEO <span id="telNucleo">100%</span></p>
+  <p>RED <span id="telRed">ESTABLE</span></p>
+  <p>LATENCIA <span id="telLatencia">--ms</span></p>
+</div>
+
+<div class="ticker-bar">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<div class="hud-buttons">
+  <button id="chatsBtn" class="hud-toggle" title="Ver mis chats guardados">
+    <span class="hud-ring"></span>
+    <span class="hud-hex"><span class="hud-icon">💬</span></span>
+    <span class="hud-count" id="chatsCount">0</span>
+    <span class="hud-label">CHATS</span>
+  </button>
+
+  <button id="notasBtn" class="hud-toggle" title="Ver mis notas">
+    <span class="hud-ring"></span>
+    <span class="hud-hex"><span class="hud-icon">📝</span></span>
+    <span class="hud-count" id="notasCount">0</span>
+    <span class="hud-label">NOTAS</span>
+  </button>
+
+  <button id="mapaBtn" class="hud-toggle" title="Buscar un lugar en el mapa">
+    <span class="hud-ring"></span>
+    <span class="hud-hex"><span class="hud-icon">🗺️</span></span>
+    <span class="hud-label">MAPA</span>
+  </button>
+</div>
+
+<main class="core-stage">
+
+  <div class="core-circle" id="micBtn" role="button" tabindex="0" title="Clic para activar o desactivar el micrófono">
+    <svg class="core-rings" viewBox="0 0 400 400">
+      <circle class="ring-static"   cx="200" cy="200" r="192"></circle>
+      <circle class="ring-static-2" cx="200" cy="200" r="172"></circle>
+      <circle class="ring-activity" cx="200" cy="200" r="192"></circle>
+      <circle class="ring-oscilo" cx="200" cy="200" r="160"></circle>
+      <g id="ticks"></g>
+      <g id="particles"></g>
+    </svg>
+
+    <div class="core-fill"></div>
+    <div class="core-crosshair"></div>
+
+    <div class="core-label">
+      <span class="core-title">JARVIS</span>
+      <div class="waveform" id="waveform">
+        <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <span class="core-sub"><span class="dot" id="statusDot"></span><span id="statusText">EN ESPERA</span></span>
+      <span class="mic-hint" id="micHint">Toca el círculo para activar el micrófono</span>
+    </div>
+  </div>
+
+  <section class="panel">
+    <div class="panel-head">
+      <span id="chatActivoTitulo">NUEVA CONVERSACIÓN</span>
+      <button id="renombrarChatActivoBtn" class="nuevo-chat-mini-btn" title="Renombrar este chat">✎</button>
+      <button id="borrarChatActivoBtn" class="nuevo-chat-mini-btn" title="Borrar este chat">🗑</button>
+      <button id="nuevoChatBtn" class="nuevo-chat-mini-btn" title="Empezar un chat nuevo">＋</button>
+    </div>
+    <div id="log" class="log"></div>
+
+    <form id="composer" class="composer">
+      <label class="toggle">
+        <input type="checkbox" id="webToggle">
+        <span>🌐 Internet</span>
+      </label>
+      <div id="imagePreview" class="image-preview" style="display:none;">
+        <img id="imagePreviewImg" alt="Imagen adjunta">
+        <button type="button" id="removeImageBtn" title="Quitar imagen">✕</button>
+      </div>
+      <div class="input-row">
+        <input type="file" id="imageInput" accept="image/*" style="display:none;">
+        <button type="button" id="attachBtn" class="attach-btn" title="Adjuntar imagen">📎</button>
+        <input id="textInput" type="text" placeholder="Orden para Jarvis…" autocomplete="off">
+        <button type="submit" class="send-btn">➤</button>
+        <button type="button" id="forgetBtn" class="forget-btn" title="Borrar este chat">✕</button>
+      </div>
+    </form>
+  </section>
+
+</main>
+
+<!-- ---------- CHATS GUARDADOS ---------- -->
+<div id="chatsOverlay" class="hud-overlay" style="display:none;">
+  <div class="hud-panel">
+    <div class="hud-panel-head">
+      <span class="hud-panel-overline">// REGISTRO DE CONVERSACIONES</span>
+      <div class="hud-panel-title-row">
+        <h2>Mis chats</h2>
+        <button id="cerrarChatsBtn" class="cerrar-btn">✕</button>
+      </div>
+    </div>
+    <button id="nuevoChatDesdeListaBtn" class="hud-primary-btn">＋ Nuevo chat</button>
+    <div id="listaChats" class="hud-lista">
+      <!-- tarjetas generadas por JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ---------- NOTAS ---------- -->
+<div id="notasOverlay" class="hud-overlay" style="display:none;">
+
+  <div id="notasVistaLista" class="hud-panel">
+    <div class="hud-panel-head">
+      <span class="hud-panel-overline">// MEMORIA ORGANIZADA</span>
+      <div class="hud-panel-title-row">
+        <h2>Mis notas</h2>
+        <button id="cerrarNotasBtn" class="cerrar-btn">✕</button>
+      </div>
+    </div>
+    <button id="nuevaNotaBtn" class="hud-primary-btn">＋ Nueva nota</button>
+    <div id="listaNotas" class="hud-lista">
+      <!-- tarjetas generadas por JS -->
+    </div>
+  </div>
+
+  <div id="notasVistaNueva" class="hud-panel" style="display:none;">
+    <div class="hud-panel-head">
+      <span class="hud-panel-overline">// NUEVA ENTRADA</span>
+      <div class="hud-panel-title-row">
+        <button id="volverDeNuevaNotaBtn" class="cerrar-btn">←</button>
+        <h2>Nueva nota</h2>
+      </div>
+    </div>
+    <form id="formNuevaNota" class="hud-form">
+      <label>Título</label>
+      <input id="nuevaNotaTitulo" type="text" placeholder="Ej. Ideas para el cumpleaños" required>
+      <label>Contenido</label>
+      <textarea id="nuevaNotaContenido" rows="8" placeholder="Escribe lo que quieras guardar…" required></textarea>
+      <button type="submit" class="hud-primary-btn">Guardar nota</button>
+    </form>
+  </div>
+
+  <div id="notasVistaDetalle" class="hud-panel" style="display:none;">
+    <div class="hud-panel-head">
+      <span class="hud-panel-overline" id="notaDetalleFecha">// —</span>
+      <div class="hud-panel-title-row">
+        <button id="volverDeNotaBtn" class="cerrar-btn">←</button>
+        <h2 id="notaDetalleTitulo">—</h2>
+        <button id="borrarNotaBtn" class="borrar-btn" title="Borrar nota">🗑</button>
+      </div>
+    </div>
+    <div id="notaDetalleContenido" class="nota-contenido"></div>
+    <textarea id="notaEditContenido" class="nota-edit-area" style="display:none;" rows="10"></textarea>
+    <div class="nota-acciones">
+      <button id="editarNotaBtn" class="hud-secondary-btn">✎ Editar</button>
+      <button id="guardarNotaBtn" class="hud-primary-btn" style="display:none;">Guardar cambios</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ---------- MAPA ---------- -->
+<div id="mapaOverlay" class="hud-overlay" style="display:none;">
+  <div class="hud-panel">
+    <div class="hud-panel-head">
+      <span class="hud-panel-overline">// UBICACIONES</span>
+      <div class="hud-panel-title-row">
+        <h2>Mapa</h2>
+        <button id="cerrarMapaBtn" class="cerrar-btn">✕</button>
+      </div>
+    </div>
+    <form id="formBuscarLugar" class="hud-form" style="margin-top:0;">
+      <div class="input-row">
+        <input id="mapaBusquedaInput" type="text" placeholder="Busca una dirección, ciudad, lugar…" autocomplete="off" style="flex:1; background:var(--panel-2); border:1px solid var(--line); border-radius:6px; padding:10px 12px; color:var(--text); font-family:'Space Grotesk',sans-serif; font-size:14px;">
+        <button type="submit" class="send-btn">➤</button>
+        <button type="button" id="miUbicacionBtn" class="attach-btn" title="Usar mi ubicación">📍</button>
+      </div>
+    </form>
+    <div id="mapaResultadosLista" class="hud-lista" style="margin-top:12px;"></div>
+    <div id="mapaVisor" style="display:none; margin-top:14px;">
+      <p id="mapaNombreLugar" style="font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--cyan-bright); margin:0 0 8px;"></p>
+      <iframe id="mapaIframe" style="width:100%; height:340px; border:1px solid var(--line-soft); border-radius:8px;" loading="lazy"></iframe>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/pin.js"></script>
+<script src="/static/js/script.js"></script>
+<script src="/static/js/chats.js"></script>
+<script src="/static/js/notas.js"></script>
+<script src="/static/js/mapa.js"></script>
+<script src="/static/js/dashboard.js"></script>
+</body>
+</html>
